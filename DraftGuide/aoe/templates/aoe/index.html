@@ -1,0 +1,96 @@
+{% load list_index %}
+<head>
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="-1">
+</head>
+
+<body>
+<table>
+  <tr>
+    <th style="vertical-align:top">
+    <form action="/aoe/submit/" method="post">{% csrf_token %}
+      <label for="tournament">Tournament: </label>
+      <select name="tournament" id="tournament" autocomplete="off">
+        <option value="NULL">NULL</option>
+        {% for tournament in tournaments %}
+          <option value="{{tournament.slug_name}}"
+          {% if tournament.id == selected_tournament.id %}
+          selected
+          {% endif %}
+          >{{tournament}}</option>
+        {% endfor %}
+      </select>
+      <br>
+      {% if selected_tournament %}
+        {% for i in team_size %}
+          <label for="player{{ i }}">Player {{ i }}:</label>
+          <select name="player" id="players"  autocomplete="off">
+            <option value="0">NULL</option>
+            {% for player in players %}
+              <option value="{{player.id}}"
+              {% if player.id == player_list|index:i %}
+                selected
+              {% endif %}
+              >{{player.name}}</option>
+            {% endfor %}
+          </select>
+          <br>
+        {% endfor %}
+      
+        {% for i in max_map_picks %}
+          <label for="maps{{ i|add:"1" }}">Map {{ i|add:"1" }}:</label>
+          <select name="maps" id="maps"  autocomplete="off">
+            <option value="0">NULL</option>
+              {% for map in tourny_maps %}
+                <option value="{{map.id}}"
+                {% if map.id == map_list|index:i %}
+                  selected
+                {% endif %}
+                >{{map}}</option>
+              {% endfor %}
+          </select>
+          <br>
+          <div style="font-size:10px;">
+            {% for strategy in map_strategies|index:i %}
+              {{ strategy.1}}, {{ strategy.0 }} <br>
+            {% endfor %}
+          </div>
+          <br>
+        {% endfor %}
+      {% endif %}
+       <label for="lower_limit">Lower Weighting Limit:</label>
+       </br>
+       <select name="lower_limit" id="lower_limit"  autocomplete="off">
+         {% for limit in lower_limit_range %}
+           <option value="{{limit}}"
+           {% if limit == lower_limit %}
+             selected
+           {% endif %}
+           >{{limit}}</option>
+         {% endfor %}
+       </select>
+       </br>
+      <input type="submit" value="Submit">
+    </form>
+  </th>
+  <th>
+    <table style="font-size:14px;" border="1px solid black">
+      {% for civ, map_stats in civ_ratings.items %}
+        <tr>
+          <th> {{civ}} </th>
+          <th> {{map_stats.0|floatformat:-1}} </th>
+          {% for weight, map, strat in map_stats.1 %}
+            <th style="font-size:10px;">
+               {{map}} </br>
+               {{strat}} </br>
+               {{weight | floatformat:-1}} </br>
+            </th>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </table>
+  </th>
+  </tr>
+</table>
+
+</body>
